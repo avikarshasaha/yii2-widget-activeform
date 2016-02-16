@@ -1,0 +1,21 @@
+{
+    "name": "avikarsha/yii2-widget-activeform",
+    "description": "Custom Active Form",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension"],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Avikarsha Saha",
+            "email": "avikarsha.saha@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "avikarsha\\form\\": ""
+        }
+    }
+}
