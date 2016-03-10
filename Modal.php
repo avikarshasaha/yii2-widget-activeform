@@ -106,7 +106,7 @@ class Modal extends Widget {
 		echo Html::beginTag('div', ['class' => 'modal-content']) . "\n";
 		// echo $this->renderHeader() . "\n";
 		echo $this->renderBodyBegin() . "\n";
-		echo $this->renderCloseButton() . "\n";
+		// echo $this->renderCloseButton() . "\n";
 	}
 
 	/**
