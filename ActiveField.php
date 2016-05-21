@@ -113,7 +113,7 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * @var string the template for radios in default layout
      */
-    public $radioTemplate = "<div class=\"radio\">\n{input}\n{beginLabel}\n{labelTitle}\n{endLabel}\n{error}\n{hint}\n</div>";
+    public $radioTemplate = "<div class=\"css-select-feild\">\n{input}\n{error}\n{hint}\n</div>";
     /**
      * @var string the template for checkboxes in horizontal layout
      */
@@ -374,14 +374,16 @@ class ActiveField extends \yii\widgets\ActiveField
                 $this->template = $options['template'];
                 unset($options['template']);
             }
+
             if (!isset($options['itemOptions'])) {
                 $options['itemOptions'] = [
                     'labelOptions' => ['class' => 'radio-inline'],
                 ];
             }
         }  elseif (!isset($options['item'])) {
+            $this->template = $this->radioTemplate;
             $options['item'] = function ($index, $label, $name, $checked, $value) {
-                return '<div class="cell">' . Html::radio($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
+                return '<div class="css-rc-box">' . Html::radio($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
             };
         }
         parent::radioList($items, $options);
