@@ -452,9 +452,7 @@ class ActiveField extends \yii\widgets\ActiveField
                 'tag' => 'p',
                 'class' => 'help-block help-block-error',
             ],
-            'inputOptions' => [
-                'class' => 'form-control',
-            ],
+            'inputOptions' => [],
         ];
 
         $layout = $instanceConfig['form']->layout;
