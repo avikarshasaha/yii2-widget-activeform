@@ -2,6 +2,7 @@
 namespace avikarsha\form;
 
 use yii\helpers\ArrayHelper;
+use yii\web\JsExpression;
 
 /**
  * A Bootstrap 3 enhanced version of [[\yii\widgets\ActiveField]].
@@ -220,8 +221,8 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public $addon = [];
     /**
-    * @var boolean is it a static input
-    */
+     * @var boolean is it a static input
+     */
     protected $_isStatic = false;
     /**
      * @var array the settings for the active field layout
@@ -234,10 +235,6 @@ class ActiveField extends \yii\widgets\ActiveField
         'showErrors' => true,
     ];
 
-
-
-
-
     /**
      * @inheritdoc
      */
@@ -247,7 +244,6 @@ class ActiveField extends \yii\widgets\ActiveField
         $config = ArrayHelper::merge($layoutConfig, $config);
         parent::__construct($config);
     }
-
 
     /**
      * @inheritdoc
@@ -274,7 +270,7 @@ class ActiveField extends \yii\widgets\ActiveField
             }
             if ($this->inputTemplate) {
                 $input = isset($this->parts['{input}']) ?
-                    $this->parts['{input}'] : Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
+                $this->parts['{input}'] : Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
 
                 $this->parts['{input}'] = strtr($this->inputTemplate, ['{input}' => $input]);
             }
@@ -285,7 +281,6 @@ class ActiveField extends \yii\widgets\ActiveField
         return parent::render($content);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -294,7 +289,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($enclosedByLabel) {
             if (!isset($options['template'])) {
                 $this->template = $this->form->layout === 'horizontal' ?
-                    $this->horizontalCheckboxTemplate : $this->checkboxTemplate;
+                $this->horizontalCheckboxTemplate : $this->checkboxTemplate;
             } else {
                 $this->template = $options['template'];
                 unset($options['template']);
@@ -319,7 +314,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($enclosedByLabel) {
             if (!isset($options['template'])) {
                 $this->template = $this->form->layout === 'horizontal' ?
-                    $this->horizontalRadioTemplate : $this->radioTemplate;
+                $this->horizontalRadioTemplate : $this->radioTemplate;
             } else {
                 $this->template = $options['template'];
                 unset($options['template']);
@@ -353,7 +348,7 @@ class ActiveField extends \yii\widgets\ActiveField
                     'labelOptions' => ['class' => 'checkbox-inline'],
                 ];
             }
-        }  elseif (!isset($options['item'])) {
+        } elseif (!isset($options['item'])) {
             $options['item'] = function ($index, $label, $name, $checked, $value) {
                 return '<div class="checkbox">' . Html::checkbox($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
             };
@@ -380,7 +375,7 @@ class ActiveField extends \yii\widgets\ActiveField
                     'labelOptions' => ['class' => 'radio-inline'],
                 ];
             }
-        }  elseif (!isset($options['item'])) {
+        } elseif (!isset($options['item'])) {
             $this->template = $this->radioTemplate;
             $options['item'] = function ($index, $label, $name, $checked, $value) {
                 return '<div class="css-rc-box">' . Html::radio($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
@@ -511,12 +506,12 @@ class ActiveField extends \yii\widgets\ActiveField
     /* ================================= Newly added for addons ========================================== */
 
     /**
-    * Parses and returns addon content
-    *
-    * @param string|array $addon the addon parameter
-    *
-    * @return string
-    */
+     * Parses and returns addon content
+     *
+     * @param string|array $addon the addon parameter
+     *
+     * @return string
+     */
     public static function getPrependAddonContent($addon)
     {
         if (!is_array($addon)) {
@@ -534,12 +529,12 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-    * Parses and returns addon content
-    *
-    * @param string|array $addon the addon parameter
-    *
-    * @return string
-    */
+     * Parses and returns addon content
+     *
+     * @param string|array $addon the addon parameter
+     *
+     * @return string
+     */
     public static function getAppendAddonContent($addon)
     {
         if (!is_array($addon)) {
@@ -628,10 +623,10 @@ class ActiveField extends \yii\widgets\ActiveField
         $newInput = $this->contentBeforeInput . $this->generateAddon() . $this->contentAfterInput;
         // $newError = "{$this->contentBeforeError}{error}{$this->contentAfterError}";
         $this->template = strtr($this->template, [
-           // '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : "",
-           '{input}' => str_replace('{input}', $newInput, $input),
-           // '{error}' => $showErrors ? str_replace('{error}', $newError, $error) : '',
-       ]);
+            // '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : "",
+            '{input}' => str_replace('{input}', $newInput, $input),
+            // '{error}' => $showErrors ? str_replace('{error}', $newError, $error) : '',
+        ]);
     }
 
     /**
@@ -657,5 +652,32 @@ class ActiveField extends \yii\widgets\ActiveField
         return $content;
     }
 
+    protected function getClientOptions()
+    {
+        $options = [];
+
+        $attribute = Html::getAttributeName($this->attribute);
+        if (!in_array($attribute, $this->model->activeAttributes(), true)) {
+            return [];
+        }
+
+        $validators = [];
+        foreach ($this->model->getActiveValidators($attribute) as $validator) {
+            /* @var $validator \yii\validators\Validator */
+            $js = $validator->clientValidateAttribute($this->model, $attribute, $this->form->getView());
+            if ($validator->enableClientValidation && $js != '') {
+                if ($validator->whenClient !== null) {
+                    $js = "if (({$validator->whenClient})(attribute, value)) { $js }";
+                }
+                $validators[] = $js;
+            }
+        }
+
+        if (!empty($validators)) {
+            $options['validate_extra'] = new JsExpression("function (attribute, value, messages, deferred, \$form) {" . implode('', $validators) . '}');
+        }
+
+        return array_merge($options, parent::getClientOptions());
+    }
 
 }

@@ -415,7 +415,7 @@ class ActiveField extends \yii\widgets\ActiveField
                     'labelOptions' => ['class' => 'checkbox-inline'],
                 ];
             }
-        }  elseif (!isset($options['item'])) {
+        } elseif (!isset($options['item'])) {
             $options['item'] = function ($index, $label, $name, $checked, $value) {
                 return '<div class="checkbox">' . Html::checkbox($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
             };
@@ -441,7 +441,7 @@ class ActiveField extends \yii\widgets\ActiveField
                     'labelOptions' => ['class' => 'radio-inline'],
                 ];
             }
-        }  elseif (!isset($options['item'])) {
+        } elseif (!isset($options['item'])) {
             $options['item'] = function ($index, $label, $name, $checked, $value) {
                 return '<div class="radio">' . Html::radio($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
             };
@@ -579,6 +579,4 @@ class ActiveField extends \yii\widgets\ActiveField
         var_dump($options);
         return parent::textInput($options);
     }
-
-
 }
