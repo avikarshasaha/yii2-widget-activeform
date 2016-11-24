@@ -140,6 +140,8 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public $enableLabel = true;
 
+    public $fileInputTemplate = "{input}\n<div class=\"css-file-input\"></div>\n{error}\n{hint}";
+
     /**
      * @var array the HTML attributes (name-value pairs) for the field container tag.
      * The values will be HTML-encoded using [[Html::encode()]].
@@ -678,6 +680,35 @@ class ActiveField extends \yii\widgets\ActiveField
         }
 
         return array_merge($options, parent::getClientOptions());
+    }
+
+    /**
+     * Renders a file input.
+     * This method will generate the "name" and "value" tag attributes automatically for the model attribute
+     * unless they are explicitly specified in `$options`.
+     * @param array $options the tag options in terms of name-value pairs. These will be rendered as
+     * the attributes of the resulting tag. The values will be HTML-encoded using [[Html::encode()]].
+     *
+     * If you set a custom `id` for the input element, you may need to adjust the [[$selectors]] accordingly.
+     *
+     * @return $this the field object itself
+     */
+    public function fileInput($options = [])
+    {
+        // https://github.com/yiisoft/yii2/pull/795
+        $this->template = $this->fileInputTemplate;
+        if ($this->inputOptions !== ['class' => 'form-control']) {
+            $options = array_merge($this->inputOptions, $options);
+        }
+        // https://github.com/yiisoft/yii2/issues/8779
+        if (!isset($this->form->options['enctype'])) {
+            $this->form->options['enctype'] = 'multipart/form-data';
+        }
+
+        $this->adjustLabelFor($options);
+        $this->parts['{input}'] = Html::activeFileInput($this->model, $this->attribute, $options);
+
+        return $this;
     }
 
 }
