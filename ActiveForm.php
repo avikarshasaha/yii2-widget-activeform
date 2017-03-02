@@ -76,6 +76,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
      */
     public $layout = 'default';
 
+    public $successCssClass = '';
+
 
     /**
      * @inheritdoc
